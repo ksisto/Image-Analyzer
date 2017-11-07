@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import *
 from Main_GUI import *
 from GraphicsArea import *
 from History import *
-
+import Constents
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -14,6 +14,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         QMainWindow.__init__(self, *args, **kwargs)
         self.setupUi(self)
         self.setUpMainUiFunction()
+
 
 
     def setUpMainUiFunction(self):
@@ -46,8 +47,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def showPicture(self, picture):
         sub = QMdiSubWindow(self)
-        loadPicture = LoadPicture(picture, sub)
-        sub.setWidget(loadPicture)
+        self.loadPicture = LoadPicture(picture, sub)
+        sub.setWidget(self.loadPicture)
         sub.setObjectName("Load_Picture_window")
         sub.setWindowTitle("New Photo")
         self.mdiArea.addSubWindow(sub)
@@ -58,9 +59,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             sub.resize(picture.size())
 
-        loadPicture.log.MousePixmapSignal.connect(self.updatePixel)
-        loadPicture.PictureArea.rectChanged.connect(self.UpdateStatueBar)
-        loadPicture.log.pointDraw.connect(self.Add_History)
+        self.loadPicture.log.MousePixmapSignal.connect(self.updatePixel)
+        self.loadPicture.PictureArea.rectChanged.connect(self.UpdateStatueBar)
+        self.loadPicture.log.pointDraw.connect(self.Add_History)
 
     def updatePixel(self, point, color):
         self.UserInput_PixelValue_X.setText("{}".format(point.x()))
@@ -82,14 +83,32 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
 
-    def Add_History(self):
+    def Add_History(self,pos):
         self.HistoryWidget = HistoryList()
+        self.HistoryWidget.setObjectName("HistoryWidget_"+ str(Constents.analysisCount))
         myQListWidgetItem = QListWidgetItem(self.History_List)
-
         myQListWidgetItem.setSizeHint(self.HistoryWidget.sizeHint())
         self.History_List.addItem(myQListWidgetItem)
         self.History_List.setItemWidget(myQListWidgetItem, self.HistoryWidget)
-        
+        self.HistoryWidget.buttonPushed.connect(self.deleteObject)
+        self.HistoryWidget.setXpoint(str(pos.x()))
+        self.HistoryWidget.setYpoint(str(pos.y()))
+        self.HistoryWidget.setHistoryName("Point "+ str(Constents.analysisCount))
+        Constents.analysisCount = Constents.analysisCount + 1
+
+
+    def deleteObject(self):
+        sender = self.sender() #var of object that sent the request
+        row_number = sender.objectName().split("_")
+        number = row_number[1]
+        x,y = Constents.analysisDetails[str(number)]# getting xy for object
+        self.loadPicture.findAndRemoveAnalysisPoint(x,y) #calling the class with the scense to delete it
+        Constents.analysisDetails.pop(str(number)) # get rid of the object in the variables
+        HistoryWidget = self.findChildren(HistoryList, "HistoryWidget_"+number)[0] #find the actual object
+
+        HistoryWidget.deleteLater() #delete that object
+        #Simport pdb; pdb.set_trace()
+        #self.History_List.takeItem(HistoryWidget)
 
     def ToDoNext(self):
         pass

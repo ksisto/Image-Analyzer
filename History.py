@@ -5,19 +5,32 @@ from PyQt5.QtWidgets import *
 from History_GUI import *
 
 class HistoryList(QWidget):
+    buttonPushed = pyqtSignal()
 
     def __init__(self, parent=None):
         QWidget.__init__(self,parent)
-        self.CustomUi = Ui_History_Item()
-        self.CustomUi.setupUi(self)
+        self.HistoryItem = Ui_History_Item()
+        self.HistoryItem.setupUi(self)
+        self.setUpWidgetUiFunction()
 
 
-    def setUpMainUiFunction(self):
-        pass
+    def setUpWidgetUiFunction(self):
+        self.HistoryItem.Button_Delete.clicked.connect(self.deleteButtonPushed)
 
-    # def setUpProjectNumber(self,ProjectNumber):
-    #     self.CustomUi.text_ProjectNumber_CHANGE.setText(ProjectNumber)
-    #
+    def setXpoint(self,X):
+        self.HistoryItem.txt_XChange.setText(X)
+
+    def setYpoint(self,Y):
+        self.HistoryItem.txt_YChange.setText(Y)
+    def setHistoryName(self,Name):
+        self.HistoryItem.txt_point.setText(Name)
+    def deleteButtonPushed(self):
+        self.buttonPushed.emit()
+        #import pdb; pdb.set_trace()
+
+
+#This site has something that can help
+#https://stackoverflow.com/questions/30916787/deleting-an-item-from-a-scene
     # def setUpProjectName(self,ProjectName):
     #     self.CustomUi.text_Project_Name_Change.setText(ProjectName)
     #
