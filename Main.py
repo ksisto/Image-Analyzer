@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import *
 from Main_GUI import *
 from GraphicsArea import *
 from History import *
+from Calibration import *
 import Constents
 
 
@@ -20,6 +21,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def setUpMainUiFunction(self):
         self.actionOpen.triggered.connect(self.OpenDialog)
         self.Button_LoadPhoto.clicked.connect(self.OpenDialog)
+        self.Button_Calibration.clicked.connect(self.CalibrationShow)
 
         open = QAction(QIcon("icons/open.bmp"), "open", self)
         save = QAction(QIcon("icons/save.bmp"), "save", self)
@@ -90,7 +92,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         myQListWidgetItem.setSizeHint(self.HistoryWidget.sizeHint())
         self.History_List.addItem(myQListWidgetItem)
         self.History_List.setItemWidget(myQListWidgetItem, self.HistoryWidget)
-        self.HistoryWidget.buttonPushed.connect(self.deleteObject)
+        self.HistoryWidget.button_delete.connect(self.deleteObject)
+        self.HistoryWidget.button_move.connect(self.moveObject)
         self.HistoryWidget.setXpoint(str(pos.x()))
         self.HistoryWidget.setYpoint(str(pos.y()))
         self.HistoryWidget.setHistoryName("Point "+ str(Constents.analysisCount))
@@ -104,11 +107,33 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         x,y = Constents.analysisDetails[str(number)]# getting xy for object
         self.loadPicture.findAndRemoveAnalysisPoint(x,y) #calling the class with the scense to delete it
         Constents.analysisDetails.pop(str(number)) # get rid of the object in the variables
-        HistoryWidget = self.findChildren(HistoryList, "HistoryWidget_"+number)[0] #find the actual object
 
-        HistoryWidget.deleteLater() #delete that object
-        #Simport pdb; pdb.set_trace()
-        #self.History_List.takeItem(HistoryWidget)
+        # get the viewport coords of the item-widget
+        pos = self.History_List.viewport().mapFromGlobal(
+        sender.mapToGlobal(QtCore.QPoint(1, 1)))
+        if not pos.isNull():
+            # get the item from the coords
+            item = self.History_List.itemAt(pos)
+            if item is not None:
+                # delete both the widget and the item
+                widget = self.History_List.itemWidget(item)
+                self.History_List.removeItemWidget(item)
+                self.History_List.takeItem(self.History_List.row(item))
+                widget.deleteLater()
+
+    def moveObject(self):
+        Constents.movePointAnalysis == True
+        print("Im there")
+
+
+    def CalibrationShow(self):
+        global Cal_window
+        Cal_window = Calibration_window()
+        #Cal_window.signal.connect(self.refresh)
+        #NewProjects.setProjectName('Test Name')
+        #NewProjects.setProjectNumber('123456789')
+        Cal_window.show()
+        #return NewProjects
 
     def ToDoNext(self):
         pass

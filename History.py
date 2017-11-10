@@ -5,7 +5,8 @@ from PyQt5.QtWidgets import *
 from History_GUI import *
 
 class HistoryList(QWidget):
-    buttonPushed = pyqtSignal()
+    button_delete = pyqtSignal()
+    button_move = pyqtSignal()
 
     def __init__(self, parent=None):
         QWidget.__init__(self,parent)
@@ -16,6 +17,7 @@ class HistoryList(QWidget):
 
     def setUpWidgetUiFunction(self):
         self.HistoryItem.Button_Delete.clicked.connect(self.deleteButtonPushed)
+        self.HistoryItem.Button_Move.clicked.connect(self.moveButtonPushed)
 
     def setXpoint(self,X):
         self.HistoryItem.txt_XChange.setText(X)
@@ -25,7 +27,9 @@ class HistoryList(QWidget):
     def setHistoryName(self,Name):
         self.HistoryItem.txt_point.setText(Name)
     def deleteButtonPushed(self):
-        self.buttonPushed.emit()
+        self.button_delete.emit()
+    def moveButtonPushed(self):
+        self.button_move.emit()
         #import pdb; pdb.set_trace()
 
 

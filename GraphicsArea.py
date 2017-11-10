@@ -26,7 +26,10 @@ class PictureItem(QGraphicsPixmapItem):
         QGraphicsPixmapItem.hoverMoveEvent(self, event)
 
     def hoverEnterEvent(self, event):
-        QApplication.setOverrideCursor(Qt.CrossCursor)
+        if Constents.movePointAnalysis == True:
+            QApplication.setOverrideCursor(Qt.SizeAllCursor)
+        else:
+            QApplication.setOverrideCursor(Qt.CrossCursor)
         QGraphicsPixmapItem.hoverMoveEvent(self, event)
 
     def hoverLeaveEvent(self, event):
